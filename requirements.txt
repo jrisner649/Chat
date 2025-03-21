@@ -1,0 +1,6 @@
+user can either create a chat room or join an existing chat room
+
+users can set a username and password
+
+start by creating a registration page that allows users to enter a username and password
+for now, the username and password will simply be stored in a file on the server

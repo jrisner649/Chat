@@ -13,8 +13,20 @@ document.querySelector('#btnRegister').addEventListener('click', (event) => {
 });
 
 function handle_registration() {
+    const baseUri = 'http://localhost:8080'
+
     const strUsername = document.querySelector('#txtUsername').value
     const strPassword = document.querySelector('#txtPassword').value
+
+    // construct a JSON obj that will be sent to the registration API
+    const user = {
+        username: `${strUsername}`,
+        password: `${strPassword}`
+    }
+    fetch(baseUri + '/register')
+    .then(response => {
+        console.log(response)
+    })
 
     console.log(strUsername)
 }

@@ -1,29 +1,51 @@
-const app = require('express')()
+const express = require('express')
+const app = express()
+app.use(express.json())
 const PORT = 8080
 
+
 // database function imports
-const { test } = require('./db');
-const { usernameTaken } = require('./db')
-const { createUser } = require('./db')
+const db = require('./db')
+
+// const { test } = require('./db');
+// const { usernameTaken } = require('./db')
+// const { createUser } = require('./db')
 
 async function runUsernameTaken(username) {
-    await usernameTaken(username);
+    return await db.usernameTaken(username);
+}
+
+async function runCreateUser(username) {
+    await db.createUser(username)
 }
 
 
 // req will be JSON obj
 app.post('/register', (req, res) => {
+    console.log(req.body)
+
     // send back an error code to the client if the username is already in the database
-    if (runUsernameTaken(req.username)) {
-        res.status(409).send('Username already in use')
-    }
+    runUsernameTaken(req.body.username)
+    .then(notTaken => {
+        if (notTaken) {
+            console.log('Username is NOT taken')
+        }
+        else {
+            console.log('Username is taken')
+        }
+    })
+
+    // if (!runUsernameTaken(req.body.username).then()) {
+    //     res.status(409).send('Username already in use')
+    // }
     // else, the username is valid
-    else {
-        // create a new record in our user database
-        createUser(req.username)
-        // send back confirmation to the client
-        res.status(200).send('Account successfully created!')
-    }
+    // else {
+    //     console.log('Username is not taken, inserting into database...')
+    //     // create a new record in our user database
+    //     runCreateUser(req.body.username)
+    //     // send back confirmation to the client
+    //     res.status(200).send('Account successfully created!')
+    // }
     
 })
 

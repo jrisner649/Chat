@@ -16,23 +16,27 @@ async function test(){
 
 // Function to test connection
 async function usernameTaken(username) {
-  let valid = false;
+  let notTaken = false;
   let conn;
   try {
     conn = await pool.getConnection();
     console.log("Connected to MariaDB!");
 
     // Run a test query
-    const rows = await conn.query(`SELECT Username FROM tblUser WHERE Username = ${username};`);
-    if (rows.length > 0){
-      valid = true
-    }
+    conn.query(`SELECT Username FROM tblUser WHERE Username = "${username}";`)
+    .then(rows => {
+        console.log('Ran query, retrived ', rows);
+        if (rows.length = 0){
+          notTaken = true
+        }
+    })
+    
     
   } catch (err) {
     console.error("Database connection error:", err);
   } finally {
     if (conn) conn.end(); // Always close the connection
-    return valid
+    return notTaken
   }
 }
 
@@ -43,7 +47,7 @@ async function createUser(username) {
     console.log("Connected to MariaDB!");
 
     // Run a test query
-    const rows = await conn.query(`INSERT INTO tblUser (Username) VALUES (${username});`);
+    const rows = await conn.query(`INSERT INTO tblUser (Username) VALUES ("${username}");`);
     console.log(rows);
 
   } catch (err) {
@@ -53,9 +57,10 @@ async function createUser(username) {
   }
 }
 
-// Export function for use in another file
-// module.exports = { test };
-module.exports = { usernameTaken };
-module.exports = { createUser };
-
+// Export multiple functions
+module.exports = {
+  test,
+  usernameTaken,
+  createUser
+};
 

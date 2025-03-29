@@ -1,15 +1,18 @@
 document.querySelector('#btnRegister').addEventListener('click', (event) => {
-    handle_registration()
-    fetch("components/create_or_join.html")
-    .then(response => response.text())
-    .then(html => {
-        const objScript = document.createElement('script');
-        objScript.src = 'js/create_or_join.js';
-        objScript.type = 'text/javascript';
-        document.head.appendChild(objScript);
-        document.querySelector('#divContent').innerHTML = html;
-    })
-    .catch(error => console.error("Error fetching create/join page:", error));
+    
+    if (handle_registration()) {
+        fetch("components/create_or_join.html")
+        .then(response => response.text())
+        .then(html => {
+            const objScript = document.createElement('script');
+            objScript.src = 'js/create_or_join.js';
+            objScript.type = 'text/javascript';
+            document.head.appendChild(objScript);
+            document.querySelector('#divContent').innerHTML = html;
+        })
+        .catch(error => console.error("Error fetching create/join page:", error));
+    }
+    
 });
 
 function handle_registration() {
@@ -20,15 +23,37 @@ function handle_registration() {
 
     // construct a JSON obj that will be sent to the registration API
     const user = {
-        username: `${strUsername}`,
-        password: `${strPassword}`
+        username: strUsername,
+        password: strPassword
     }
-    fetch(baseUri + '/register')
+    console.log(user)
+
+    // make the API call
+    fetch(baseUri + '/register', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(user)
+    })
     .then(response => {
-        console.log(response)
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`)
+        }
+        else {
+            console.log(response)
+            return response
+        }
+    })
+    .then(result => {
+        console.log('Success: ', result)
+        return true
+    })
+    .catch(error => {
+        console.error('Error: ', error)
+        return false
     })
 
-    console.log(strUsername)
 }
 
 
